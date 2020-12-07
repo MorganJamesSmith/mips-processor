@@ -14,7 +14,7 @@ module data_memory
 
     integer      i;
 
-    reg [31:0]   data_memory[31:0];
+    reg [31:0]   data_memory[5:0];
 
     reg [31:0]   data_out_reg;
     assign data_out = data_out_reg;
@@ -23,7 +23,7 @@ module data_memory
     begin
         if(rst)
         begin
-            for(i = 0; i < 4294967296; i++)
+            for(i = 0; i < 32; i++)
               data_memory[i] <= 32'b0;
         end
         else
