@@ -9,8 +9,9 @@
 
 module mips_tb;
 
-    // TODO: Use the mips module instead of putting everything together here
+    // TODO: Make a mips module instead of putting everything together here
 
+    // Program Counter
     reg [31:0] PC;
 
     reg        reg_write;
@@ -28,13 +29,21 @@ module mips_tb;
 
     wire [31:0] instruction;
 
-    wire [3:0]  alu_op = instruction[31:26];
+    wire [5:0]  opcode = instruction[31:26];
+    wire [5:0]  funct = instruction[5:0];
+
+    // Sign extending the immediate
+    wire [31:0]  immediate = { {16{instruction[15]}}, instruction[15:0]};
+
     wire        alu_zero;
 
+    wire [31:0] alu_busB = (opcode == 6'b001000) ? immediate : busB;
+
     alu alu(
-            .op(alu_op),
+            .opcode(opcode),
+            .funct(funct),
             .busA(busA),
-            .busB(busB),
+            .busB(alu_busB),
             .result(busW),
             .zero(alu_zero),
             .clk(clk),
