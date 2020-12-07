@@ -1,10 +1,13 @@
 // Copyright (C) 2020 Morgan Smith <Morgan.J.Smith@outlook.com>
 
-`define OP_NOP  4'b0000
-`define OP_ADD  4'b0001
-`define OP_SUB  4'b0010
-`define OP_MUL  4'b0011
-`define OP_DIV  4'b0100
+`include "opcodes.v"
+
+// These opcodes are internal to the ALU and should not be used anywhere else
+`define ALU_OP_NOP  4'b0000
+`define ALU_OP_ADD  4'b0001
+`define ALU_OP_SUB  4'b0010
+`define ALU_OP_MUL  4'b0011
+`define ALU_OP_DIV  4'b0100
 
 module alu_control
   (
@@ -22,20 +25,20 @@ module alu_control
           6'b000000:
             begin
                 case(funct)
-                6'b100000:
-                  opreg = `OP_ADD;
-                6'b100010:
-                  opreg = `OP_SUB ;
-                6'b011000:
-                  opreg = `OP_MUL ;
-                6'b011010:
-                  opreg = `OP_DIV;
+                `FUNCT_ADD:
+                  opreg = `ALU_OP_ADD;
+                `FUNCT_SUB:
+                  opreg = `ALU_OP_SUB ;
+                `FUNCT_MUL:
+                  opreg = `ALU_OP_MUL ;
+                `FUNCT_DIV:
+                  opreg = `ALU_OP_DIV;
                 endcase // case (funct)
             end
         6'b001000:
-          opreg = `OP_ADD;
+          opreg = `ALU_OP_ADD;
         default:
-          opreg = `OP_NOP;
+          opreg = `ALU_OP_NOP;
         endcase // case (opcode)
     end // always @ (opcode or funct)
 endmodule // alu_control
@@ -76,13 +79,13 @@ module alu
         else
         begin
             case(op)
-            `OP_ADD:
+            `ALU_OP_ADD:
                   result_reg <= busA + busB;
-            `OP_SUB:
+            `ALU_OP_SUB:
                   result_reg <= busA - busB;
-            `OP_MUL:
+            `ALU_OP_MUL:
                   result_reg <= busA * busB;
-            `OP_DIV:
+            `ALU_OP_DIV:
                   result_reg <= busA / busB;
             endcase // case (op)
         end
