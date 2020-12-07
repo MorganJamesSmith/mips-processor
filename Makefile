@@ -7,7 +7,7 @@ TARGET=mips
 
 SRC = $(wildcard *.v)
 
-FILES = Makefile instructions.hex readme.org
+FILES = Makefile binary-instructions.txt readme.org
 
 ${TARGET}_tb.vcd:
 
