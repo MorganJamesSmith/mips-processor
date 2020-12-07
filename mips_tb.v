@@ -2,6 +2,8 @@
 
 `timescale  1 ns / 1 ns
 
+`include "opcodes.v"
+
 `define test(signal, value) \
         if (signal !== value) begin \
             $display("TEST FAILED in %m: signal != value"); \
@@ -11,43 +13,22 @@ module mips_tb;
 
     // TODO: Make a mips module instead of putting everything together here
 
+    reg         rst;
+    reg         clk;
+
     // Program Counter
     reg [31:0] PC;
-
-    reg        reg_write;
-    reg [4:0]  write_register;
-    wire [31:0] busW;
-
-    reg [4:0]   RA;
-    reg [4:0]   RB;
 
     wire [31:0] busA;
     wire [31:0] busB;
 
-    reg         rst;
-    reg         clk;
 
     wire [31:0] instruction;
-
     wire [5:0]  opcode = instruction[31:26];
-    wire [5:0]  funct = instruction[5:0];
-
-    // Sign extending the immediate
+    wire [4:0]  RA = instruction[25:21];
+    wire [4:0]  RB = instruction[20:16];
     wire [31:0]  immediate = { {16{instruction[15]}}, instruction[15:0]};
-
-    wire        alu_zero;
-
-    wire [31:0] alu_busB = (opcode == 6'b001000) ? immediate : busB;
-
-    alu alu(
-            .opcode(opcode),
-            .funct(funct),
-            .busA(busA),
-            .busB(alu_busB),
-            .result(busW),
-            .zero(alu_zero),
-            .clk(clk),
-            .rst(rst));
+    wire [5:0]  funct = instruction[5:0];
 
     instruction_memory imem(
                             .read_address(PC),
@@ -56,16 +37,47 @@ module mips_tb;
                             .rst(rst));
 
 
+    wire        alu_zero;
+    wire [31:0] alu_out;
+    wire [31:0] alu_busB = (opcode == 6'b001000) ? immediate : busB;
+
+    alu alu(
+            .opcode(opcode),
+            .funct(funct),
+            .busA(busA),
+            .busB(alu_busB),
+            .result(alu_out),
+            .zero(alu_zero),
+            .clk(clk),
+            .rst(rst));
+
+
+
+    reg         reg_write_enable;
+    reg [4:0]   reg_write_register;
+    wire [31:0] reg_write_data;
+    assign reg_write_data = (`IS_MEMORY_ACCESS(opcode)) ? dmem_out : alu_out;
+
     register_file reg_file(
-                           .write_enable(reg_write),
-                           .write_register(write_register),
-                           .busW(busW),
+                           .write_enable(reg_write_enable),
+                           .write_register(reg_write_register),
+                           .busW(reg_write_data),
                            .RA(RA),
                            .RB(RB),
                            .busA(busA),
                            .busB(busB),
                            .rst(rst),
                            .clk(clk));
+
+    reg         dmem_write;
+    wire [31:0] dmem_out;
+    data_memory dmem(
+                     .address(alu_out),
+                     .write_enable(dmem_write),
+                     .data_in(busB),
+                     .data_out(dmem_out),
+                     .rst(rst),
+                     .clk(clk));
 
     always #10 clk = ~clk;
 
@@ -79,17 +91,13 @@ module mips_tb;
         clk = 1'b0;
 
         PC = 32'd0;
-        reg_write = 1'b0;
-        write_register = 5'b0;
-
-        RA = 5'b0;
-        RB = 5'b0;
+        reg_write_enable = 1'b0;
+        reg_write_register = 5'b0;
 
         #20;
         @(posedge clk);
+        `test(alu_out, 32'b0);
         rst = 1'b0;
-        `test(busA, 32'b0);
-        `test(busB, 32'b0);
 
 
         #20;
@@ -99,8 +107,7 @@ module mips_tb;
         @(posedge clk);
 
         #10;
-        `test(busA, 32'd0);
-        `test(busB, 32'd0);
+        `test(alu_out, 32'd5);
 
         $display("Test complete");
         $finish;
