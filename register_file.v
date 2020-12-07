@@ -40,7 +40,9 @@ module register_file
         begin
             if(write_enable)
             begin
-                registers[write_register] <= busW;
+                // Register 0 should always contain 0
+                if (write_register !== 0)
+                  registers[write_register] <= busW;
             end
             else
             begin
