@@ -1,0 +1,43 @@
+#+title: My MIPS processor
+#+author: Morgan Smith
+* Description
+This is a single cycle MIPS processor implemented in Verilog. This was done for
+my Computer Systems Architecture course SYSC4310 at Carleton University taught
+by Dr. Paulo Garcia.
+* Running
+Install Icarus Verilog and GNU Make and then run
+#+begin_src sh
+make
+#+end_src
+
+Then use gtkwave to view the resulting =mips_tb.vcd= file
+
+* Development
+I wrote all the files in Emacs using the builtin verilog-mode configured as follows
+#+begin_src elisp
+(use-package verilog-mode
+  :custom
+  (verilog-indent-level             4)
+  (verilog-indent-level-module      4)
+  (verilog-indent-level-declaration 4)
+  (verilog-indent-level-behavioral  4)
+  (verilog-case-indent              0)
+  (verilog-auto-newline             nil)
+  (verilog-auto-indent-on-newline   t)
+  (verilog-minimum-comment-distance 0)
+  (verilog-indent-begin-after-if    nil))
+#+end_src
+
+* Files
+** mips_tb.v
+This runs the processor
+** instruction_memory.v
+When given a memory address it will return the appropriate instruction.
+*** instructions.hex
+These are the instructions the processor will run when running make. These are
+loaded into the instruction_memory module
+** alu.v
+The alu performs all arithmetic operations and decodes the op codes
+** data_memory.v
+This is the data that the processor can manipulate
+** register_file.v
