@@ -27,12 +27,25 @@ module register_file
     assign busB = busB_reg;
 
 
-    always@(posedge clk)
+    always @ (RS or RT or rst)
     begin
         if(rst)
         begin
             busA_reg <= 32'b0;
             busB_reg <= 32'b0;
+        end
+        else
+        begin
+            busA_reg = registers[RS];
+            busB_reg = registers[RT];
+        end
+    end // always@ (RS or RT or rst)
+
+
+    always@(posedge clk)
+    begin
+        if(rst)
+        begin
             for(i = 0; i < 32; i++)
               registers[i] <= 32'b0;
         end
@@ -44,11 +57,7 @@ module register_file
                 if (write_register !== 0)
                   registers[write_register] <= busW;
             end
-            else
-            begin
-                busA_reg <= registers[RA];
-                busB_reg <= registers[RB];
-            end
         end
     end // always@ (posedge clk)
+
 endmodule // register_file

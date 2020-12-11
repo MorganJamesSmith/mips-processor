@@ -70,7 +70,7 @@ module alu
     assign result = result_reg;
 
 
-    always@(posedge clk)
+    always @ (op or busA or busB or rst)
     begin
         if(rst)
         begin

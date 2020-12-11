@@ -18,7 +18,7 @@ module instruction_memory
     reg [31:0] instruction_reg;
     assign instruction = instruction_reg;
 
-    always@(posedge clk)
+    always @ (read_address or rst)
     begin
         if(rst)
         begin
