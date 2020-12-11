@@ -33,11 +33,13 @@ I wrote all the files in Emacs using the builtin verilog-mode configured as foll
 This runs the processor
 ** instruction_memory.v
 When given a memory address it will return the appropriate instruction.
-*** instructions.hex
-These are the instructions the processor will run when running make. These are
-loaded into the instruction_memory module
+*** binary-instructions.txt
+These are the instructions the processor will run. These are loaded into the
+instruction_memory module
 ** alu.v
 The alu performs all arithmetic operations and decodes the op codes
+** opcodes.v
+Defines all the opcodes with nice names and defines a few helper functions
 ** data_memory.v
 This is the data that the processor can manipulate
 ** register_file.v
