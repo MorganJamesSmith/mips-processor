@@ -27,6 +27,11 @@
         ((opcode == 6'b000000 ) ? `true : \
          `false)
 
+`define OP_J   6'b000010
+`define J_TYPE_INSTRUCTION(opcode) \
+        ((opcode == `OP_J ) ? `true : \
+         `false)
+
 // Memory Access
 `define OP_LB   6'b100000
 `define OP_LBU  6'b100100

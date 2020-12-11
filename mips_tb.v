@@ -17,9 +17,13 @@ module mips_tb;
     reg         clk;
 
     wire [31:0] pc;
+    wire        jmp;
+    wire [31:0] jmp_adr;
 
     pc pc_module(
                  .pc(pc),
+                 .jmp(jmp),
+                 .jmp_adr(jmp_adr),
                  .clk(clk),
                  .rst(rst));
 
@@ -34,6 +38,10 @@ module mips_tb;
     wire [4:0]  RD = instruction[15:10];
     wire [31:0]  immediate = { {16{instruction[15]}}, instruction[15:0]};
     wire [5:0]  funct = instruction[5:0];
+    wire [25:0]  jump_target = instruction[25:0];
+
+    assign jmp_adr = (opcode == `OP_J) ? jump_target : 26'b0;
+    assign jmp = (opcode == `OP_J) ? 1'b1 : 1'b0;
 
     instruction_memory imem(
                             .read_address(pc),
@@ -100,6 +108,20 @@ module mips_tb;
         @(posedge clk);
         rst = 1'b0;
 
+        @(posedge clk);
+        // lui $s1, 7
+        `test(reg_write_register, 5'b1)
+        `test(reg_write_data, 32'd7)
+        `test(reg_write_enable, 1'b1)
+
+        @(posedge clk);
+        // addi $s2, $s1, 5
+        `test(reg_write_register, 5'd2)
+        `test(reg_write_data, 32'd12)
+        `test(reg_write_enable, 1'b1)
+        @(posedge clk);
+        // Start over!
+        // j 0
         @(posedge clk);
         // lui $s1, 7
         `test(reg_write_register, 5'b1)
