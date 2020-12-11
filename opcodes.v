@@ -14,6 +14,18 @@
 `define FUNCT_MUL  6'b011000
 `define FUNCT_DIV  6'b011010
 
+`define OP_ADDI  6'b001000
+
+`define OP_LUI   6'b001111
+
+`define I_TYPE_INSTRUCTION(opcode) \
+        ((opcode == `OP_ADDI ) ? `true : \
+         (opcode == `OP_LUI ) ? `true : \
+         `false)
+
+`define R_TYPE_INSTRUCTION(opcode) \
+        ((opcode == 6'b000000 ) ? `true : \
+         `false)
 
 // Memory Access
 `define OP_LB   6'b100000
