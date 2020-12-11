@@ -16,8 +16,12 @@ module mips_tb;
     reg         rst;
     reg         clk;
 
-    // Program Counter
-    reg [31:0] PC;
+    wire [31:0] pc;
+
+    pc pc_module(
+                 .pc(pc),
+                 .clk(clk),
+                 .rst(rst));
 
     wire [31:0] busA;
     wire [31:0] busB;
@@ -31,7 +35,7 @@ module mips_tb;
     wire [5:0]  funct = instruction[5:0];
 
     instruction_memory imem(
-                            .read_address(PC),
+                            .read_address(pc),
                             .instruction(instruction),
                             .clk(clk),
                             .rst(rst));
@@ -90,7 +94,6 @@ module mips_tb;
         rst = 1'b1;
         clk = 1'b0;
 
-        PC = 32'd0;
         reg_write_enable = 1'b0;
         reg_write_register = 5'b0;
 
