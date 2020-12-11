@@ -31,6 +31,7 @@ module mips_tb;
     wire [5:0]  opcode = instruction[31:26];
     wire [4:0]  RS = instruction[25:21];
     wire [4:0]  RT = instruction[20:16];
+    wire [4:0]  RD = instruction[15:10];
     wire [31:0]  immediate = { {16{instruction[15]}}, instruction[15:0]};
     wire [5:0]  funct = instruction[5:0];
 
@@ -43,7 +44,7 @@ module mips_tb;
 
     wire        alu_zero;
     wire [31:0] alu_out;
-    wire [31:0] alu_busB = (opcode == 6'b001000) ? immediate : busB;
+    wire [31:0] alu_busB = (`I_TYPE_INSTRUCTION(opcode)) ? immediate : busB;
 
     alu alu(
             .opcode(opcode),
@@ -57,8 +58,10 @@ module mips_tb;
 
 
 
-    reg         reg_write_enable;
-    reg [4:0]   reg_write_register;
+    wire reg_write_enable = ((opcode == `OP_LUI) ? 1'b1 :
+                             (opcode == `OP_ADDI) ? 1'b1 :
+                             1'b0);
+    wire [4:0] reg_write_register = (`I_TYPE_INSTRUCTION(opcode)) ? RT : RD;
     wire [31:0] reg_write_data;
     assign reg_write_data = (`IS_MEMORY_ACCESS(opcode)) ? dmem_out : alu_out;
 
@@ -87,30 +90,27 @@ module mips_tb;
 
     initial begin
 
+        rst = 1'b1;
+        clk = 1'b0;
+        @(posedge clk);
+
         $dumpfile("mips_tb.vcd");
         $dumpvars(0, mips_tb);
 
-        // reset conditions
-        rst = 1'b1;
-        clk = 1'b0;
-
-        reg_write_enable = 1'b0;
-        reg_write_register = 5'b0;
-
-        #20;
         @(posedge clk);
-        `test(alu_out, 32'b0);
         rst = 1'b0;
 
-
-        #20;
         @(posedge clk);
+        // lui $s1, 7
+        `test(reg_write_register, 5'b1)
+        `test(reg_write_data, 32'd7)
+        `test(reg_write_enable, 1'b1)
 
-        #20;
         @(posedge clk);
-
-        #10;
-        `test(alu_out, 32'd5);
+        // addi $s2, $s1, 5
+        `test(reg_write_register, 5'd2)
+        `test(reg_write_data, 32'd12)
+        `test(reg_write_enable, 1'b1)
 
         $display("Test complete");
         $finish;
