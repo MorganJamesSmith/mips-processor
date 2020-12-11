@@ -9,10 +9,10 @@ module instruction_memory
    input         rst
    );
 
-    reg [31:0]   memory[31:0];
+    reg [7:0]   memory[31:0];
 
     initial begin
-        $readmemb("binary-instructions.txt", memory, 0, 15);
+        $readmemb("binary-instructions.txt", memory, 0, 7);
     end
 
     reg [31:0] instruction_reg;
@@ -26,7 +26,10 @@ module instruction_memory
         end
         else
         begin
-            instruction_reg <= memory[read_address];
+            instruction_reg <= {memory[read_address],
+                                memory[read_address + 1],
+                                memory[read_address + 2],
+                                memory[read_address + 3]};
         end
     end // always@ (posedge clk)
 endmodule // instruction_memory
