@@ -25,8 +25,8 @@ module mips_tb;
 
     wire [31:0] instruction;
     wire [5:0]  opcode = instruction[31:26];
-    wire [4:0]  RA = instruction[25:21];
-    wire [4:0]  RB = instruction[20:16];
+    wire [4:0]  RS = instruction[25:21];
+    wire [4:0]  RT = instruction[20:16];
     wire [31:0]  immediate = { {16{instruction[15]}}, instruction[15:0]};
     wire [5:0]  funct = instruction[5:0];
 
@@ -62,8 +62,8 @@ module mips_tb;
                            .write_enable(reg_write_enable),
                            .write_register(reg_write_register),
                            .busW(reg_write_data),
-                           .RA(RA),
-                           .RB(RB),
+                           .RS(RS),
+                           .RT(RT),
                            .busA(busA),
                            .busB(busB),
                            .rst(rst),

@@ -6,8 +6,8 @@ module register_file
    input [4:0]   write_register,
    input [31:0]  busW,
 
-   input [4:0]   RA,
-   input [4:0]   RB,
+   input [4:0]   RS,
+   input [4:0]   RT,
 
    output [31:0] busA,
    output [31:0] busB,
