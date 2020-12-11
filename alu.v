@@ -35,7 +35,7 @@ module alu_control
                   opreg = `ALU_OP_DIV;
                 endcase // case (funct)
             end
-        6'b001000:
+        `OP_ADDI:
           opreg = `ALU_OP_ADD;
         default:
           opreg = `ALU_OP_NOP;
@@ -79,14 +79,17 @@ module alu
         else
         begin
             case(op)
+            `ALU_OP_NOP:
+              // used to output immediates and register values
+              result_reg <= busB;
             `ALU_OP_ADD:
-                  result_reg <= busA + busB;
+              result_reg <= busA + busB;
             `ALU_OP_SUB:
-                  result_reg <= busA - busB;
+              result_reg <= busA - busB;
             `ALU_OP_MUL:
-                  result_reg <= busA * busB;
+              result_reg <= busA * busB;
             `ALU_OP_DIV:
-                  result_reg <= busA / busB;
+              result_reg <= busA / busB;
             endcase // case (op)
         end
     end // always@ (posedge clk)
