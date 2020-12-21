@@ -16,16 +16,28 @@ module mips_tb;
     reg         rst;
     reg         clk;
 
-    wire [31:0] pc;
+    reg [31:0] pc;
     wire        jmp;
     wire [31:0] jmp_adr;
 
-    pc pc_module(
-                 .pc(pc),
-                 .jmp(jmp),
-                 .jmp_adr(jmp_adr),
-                 .clk(clk),
-                 .rst(rst));
+    // PC
+    always@(posedge clk)
+    begin
+        if(rst)
+        begin
+            pc <= 32'd0;
+        end
+        else
+        begin
+            case(opcode)
+            `OP_J:
+              pc <= jmp_adr;
+            default:
+              pc <= pc + 32'd4;
+            endcase
+        end
+    end // always@ (posedge clk)
+
 
     wire [31:0] busA;
     wire [31:0] busB;
