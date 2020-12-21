@@ -14,8 +14,8 @@ ${TARGET}_tb.vcd:
 %.vcd:%.vvp
 	vvp $<
 
-%.vvp:%.v ${SRC}
-	iverilog -o $@ $^
+%.vvp:%.v ${SRC} binary-instructions.txt
+	iverilog -o $@ ${SRC}
 
 # This is for submitting my work to my professor
 ${TARGET}.zip: ${SRC} ${FILES}
