@@ -68,6 +68,7 @@ module alu
 
     reg [31:0]   result_reg;
     assign result = result_reg;
+    assign zero = result == 32'd0;
 
 
     always @ (op or busA or busB or rst)
@@ -79,9 +80,6 @@ module alu
         else
         begin
             case(op)
-            `ALU_OP_NOP:
-              // used to output immediates and register values
-              result_reg <= busB;
             `ALU_OP_ADD:
               result_reg <= busA + busB;
             `ALU_OP_SUB:
@@ -90,6 +88,9 @@ module alu
               result_reg <= busA * busB;
             `ALU_OP_DIV:
               result_reg <= busA / busB;
+            default:
+              // used to output immediates and register values
+              result_reg <= busB;
             endcase // case (op)
         end
     end // always@ (posedge clk)
