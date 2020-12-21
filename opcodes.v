@@ -15,10 +15,17 @@
 `define FUNCT_DIV  6'b011010
 
 `define OP_ADDI  6'b001000
-
 `define OP_LUI   6'b001111
+`define OP_BEQ   6'b000100
 
 `define I_TYPE_INSTRUCTION(opcode) \
+        ((opcode == `OP_ADDI ) ? `true : \
+         (opcode == `OP_LUI ) ? `true : \
+         (opcode == `OP_BEQ ) ? `true : \
+         `false)
+
+// This determines whether the immediate or rt is feed into input B of the ALU
+`define IMMEDIATE_INSTRUCTION(opcode) \
         ((opcode == `OP_ADDI ) ? `true : \
          (opcode == `OP_LUI ) ? `true : \
          `false)

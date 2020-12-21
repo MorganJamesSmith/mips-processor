@@ -32,6 +32,11 @@ module mips_tb;
             case(opcode)
             `OP_J:
               pc <= jmp_adr;
+            `OP_BEQ:
+                if(alu_zero)
+                  pc <= pc + 32'd4 + (32'd4 * immediate);
+                else
+                  pc <= pc + 32'd4;
             default:
               pc <= pc + 32'd4;
             endcase
@@ -64,11 +69,13 @@ module mips_tb;
 
     wire        alu_zero;
     wire [31:0] alu_out;
-    wire [31:0] alu_busB = (`I_TYPE_INSTRUCTION(opcode)) ? immediate : busB;
+    wire [31:0] alu_busB = (`IMMEDIATE_INSTRUCTION(opcode)) ? immediate : busB;
+    wire [5:0]  alu_opcode = (opcode == `OP_BEQ) ? 6'b000000 : opcode;
+    wire [5:0]  alu_funct = (opcode == `OP_BEQ) ? `FUNCT_SUB : funct;
 
     alu alu(
-            .opcode(opcode),
-            .funct(funct),
+            .opcode(alu_opcode),
+            .funct(alu_funct),
             .busA(busA),
             .busB(alu_busB),
             .result(alu_out),
@@ -132,14 +139,7 @@ module mips_tb;
         `test(reg_write_data, 32'd12)
         `test(reg_write_enable, 1'b1)
         @(posedge clk);
-        // Start over!
-        // j 0
-        @(posedge clk);
-        // lui $s1, 7
-        `test(reg_write_register, 5'b1)
-        `test(reg_write_data, 32'd7)
-        `test(reg_write_enable, 1'b1)
-
+        // beq $s0, $s0, 2
         @(posedge clk);
         // addi $s2, $s1, 5
         `test(reg_write_register, 5'd2)

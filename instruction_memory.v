@@ -12,7 +12,7 @@ module instruction_memory
     reg [7:0]   memory[31:0];
 
     initial begin
-        $readmemb("binary-instructions.txt", memory, 0, 11);
+        $readmemb("binary-instructions.txt", memory, 0, 23);
     end
 
     reg [31:0] instruction_reg;
